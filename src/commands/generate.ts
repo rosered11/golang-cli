@@ -9,7 +9,7 @@ export default class Generate extends Command {
   static args = [
     {
       name: 'file_name',
-      description: 'json soruce file for convert to struct.',
+      description: 'Json soruce file for convert to struct.',
       required: true,
     }
   ];
@@ -18,6 +18,7 @@ export default class Generate extends Command {
     split: Flags.boolean({
       char: 's',
       default: false,
+      description: 'Split struct follow sub schema.'
     }),
   }
 
