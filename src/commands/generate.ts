@@ -8,32 +8,35 @@ export default class Generate extends Command {
 
   static args = [
     {
-      name: 'json_source',
+      name: 'file_name',
       description: 'json soruce file for convert to struct.',
       required: true,
-    },
-    {
-      name: 'out_struct',
-      description: 'output generate struct file'
     }
   ];
 
+  static flags = {
+    split: Flags.boolean({
+      char: 's',
+      default: false,
+    }),
+  }
+
   async run() : Promise<void>{
-    const {args} = await this.parse(Generate)
+    const {args, flags} = await this.parse(Generate)
     const fileExtension = '.go'
-    const fileName = `${args.json_source}${args.json_source.slice(-3) === fileExtension ? '' : fileExtension}`
+    const fileName = `${args.file_name}${args.file_name.slice(-3) === fileExtension ? '' : fileExtension}`
     const noteName = fileName.slice(0, -3)
-    const locationFile = path.join(process.cwd(), args.json_source)
+    const locationFile = path.join(process.cwd(), args.file_name)
+    const splitFlag = flags.split
     this.log(`path "${locationFile}"`)
     const file = readFileSync(locationFile, 'utf-8');
 
     let j2s = new Json2Struct()
-    //this.log(`output "${j2s.jsonToStruct(file).go}"`)
 
     if (existsSync(fileName)) {
       this.log(`Note "${noteName}" already exists, use "edit" or "delete" instead`)
     } else {
-      writeFileSync(fileName, `${j2s.jsonToStruct(file).go}`)
+      writeFileSync(fileName, `${j2s.jsonToStruct(file, null, splitFlag).go}`)
       this.log(`Created "${noteName}" note`)
     }
   }
