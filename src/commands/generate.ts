@@ -1,14 +1,10 @@
-import {Command, flags} from '@oclif/command'
+import {Command, Flags} from '@oclif/core'
 import {existsSync, readFileSync, writeFileSync} from 'fs'
-import {Json2Struct} from '../../json2struct/json_to_struct'
+import {Json2Struct} from '../json2struct/json_to_struct'
 import * as path from 'path'
 
 export default class Generate extends Command {
-  static description = 'generate struct'
-
-  static flags = {
-    help: flags.help({char: 'h'}),
-  }
+  static description = 'Generate struct model for golang.'
 
   static args = [
     {
@@ -20,10 +16,10 @@ export default class Generate extends Command {
       name: 'out_struct',
       description: 'output generate struct file'
     }
-  ]
+  ];
 
-  async run() {
-    const {args} = this.parse(Generate)
+  async run() : Promise<void>{
+    const {args} = await this.parse(Generate)
     const fileExtension = '.go'
     const fileName = `${args.json_source}${args.json_source.slice(-3) === fileExtension ? '' : fileExtension}`
     const noteName = fileName.slice(0, -3)
@@ -32,12 +28,12 @@ export default class Generate extends Command {
     const file = readFileSync(locationFile, 'utf-8');
 
     let j2s = new Json2Struct()
-    this.log(`output "${j2s.jsonToStruct(file).go}"`)
+    //this.log(`output "${j2s.jsonToStruct(file).go}"`)
 
     if (existsSync(fileName)) {
       this.log(`Note "${noteName}" already exists, use "edit" or "delete" instead`)
     } else {
-      //writeFileSync(fileName, `${j2s.jsonToStruct(file).go}`)
+      writeFileSync(fileName, `${j2s.jsonToStruct(file).go}`)
       this.log(`Created "${noteName}" note`)
     }
   }
